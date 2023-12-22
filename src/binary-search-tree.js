@@ -10,6 +10,7 @@ class BinarySearchTree {
   constructor () {
     this.treeRoot = null;
     this.foundNode = null;
+    this.parentNode = null;
   }
   root() {
     return this.treeRoot;
@@ -55,14 +56,15 @@ class BinarySearchTree {
       }
       if(compareNode.data > data){
         if(!compareNode.left){return false}
+        this.parentNode = compareNode;
         compareNode = compareNode.left;
       }
       if(compareNode.data < data){
         if(!compareNode.right){return false}
+        this.parentNode = compareNode;
         compareNode = compareNode.right;
       }
     }
-    return false;
   }
 
   find(data) {
@@ -72,13 +74,53 @@ class BinarySearchTree {
 
   remove(data) {
     this.has(data);
-
+    
     if(this.foundNode){
-      if(!this.foundNode.left && this.foundNode.right){
+      let countChildren = (this.foundNode.left ? 1:0) + (this.foundNode.right ? 1:0) 
+
+      if(countChildren === 0){
+        if(!this.parentNode){
+          this.treeRoot = null;
+        } else {
+          if(this.parentNode.right === this.foundNode){
+            this.parentNode.right = null;
+          } else {
+            this.parentNode.left = null;
+          }
+        }
+      }
+
+      if(countChildren === 1){
+        if(!this.parentNode){
+          this.treeRoot = this.foundNode;
+        } else {
+          if(this.parentNode.right  === this.foundNode){
+            this.parentNode.right = this.foundNode.right || this.foundNode.left;
+          } else{
+            this.parentNode.left = this.foundNode.right || this.foundNode.left;
+          }
+        }
+      }
+
+      if(countChildren === 2){
+        let targetNode = this.foundNode.right;
+        let targetParent = this.foundNode;
+
+        while(targetNode.left !== null){
+          targetNode = targetNode.left;
+          targetParent = targetNode;
+        }
+
+        this.foundNode.data = targetNode.data;
+        if (targetParent.right === targetNode) {
+          targetParent.right = targetNode.right;
+        } else {
+          targetParent.left = targetNode.right;
+        }
         
       }
     }
-    return false;
+   
   }
 
   min() {
